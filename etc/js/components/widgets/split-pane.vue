@@ -59,18 +59,6 @@ const createResizer = (leftPane, rightPane, index) => {
       originalWidth: pane.offsetWidth
     }));
 
-    // Debug logging
-    console.log('Resize start:', {
-      leftPane: leftPane.className || 'no-class',
-      rightPane: rightPane.className || 'no-class',
-      startLeftWidth,
-      startRightWidth,
-      containerWidth,
-      leftPaneIndex: Array.from(container.value.children).indexOf(leftPane),
-      rightPaneIndex: Array.from(container.value.children).indexOf(rightPane),
-      allPaneWidths: window.originalPaneWidths.map(({ originalWidth }) => originalWidth)
-    });
-
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mouseup', onMouseUp);
     document.body.style.cursor = 'col-resize';
@@ -133,14 +121,6 @@ const createResizer = (leftPane, rightPane, index) => {
     const leftIndex = allPanes.indexOf(leftPane);
     const rightIndex = allPanes.indexOf(rightPane);
 
-    console.log('Applying widths:', {
-      leftIndex,
-      rightIndex,
-      proposedLeftWidth,
-      proposedRightWidth,
-      allPanesCount: allPanes.length
-    });
-
     allPanes.forEach((pane, index) => {
       let width;
       if (index === leftIndex) {
@@ -152,8 +132,6 @@ const createResizer = (leftPane, rightPane, index) => {
         const originalPaneData = window.originalPaneWidths.find(data => data.pane === pane);
         width = originalPaneData ? originalPaneData.originalWidth : pane.offsetWidth;
       }
-
-      console.log(`Pane ${index}: setting width to ${width}px`);
 
       pane.style.width = width + 'px';
       pane.style.flexGrow = '0';
@@ -173,8 +151,6 @@ const createResizer = (leftPane, rightPane, index) => {
     if (window.originalPaneWidths) {
       delete window.originalPaneWidths;
     }
-
-    console.log('Drag ended');
   };
 
   resizer.addEventListener('mousedown', onMouseDown);
@@ -206,19 +182,6 @@ const setupResizers = () => {
   const resizerWidth = 6 * (paneElements.length - 1); // Width for all future resizers
   const availableWidth = containerWidth - resizerWidth;
 
-  console.log('Setup resizers:', {
-    containerWidth,
-    availableWidth,
-    paneCount: paneElements.length,
-    registeredPanes: panes.value.length,
-    paneProps: panes.value.map(props => ({ width: props.width, minWidth: props.minWidth })),
-    paneWidths: paneElements.map(pane => ({
-      offsetWidth: pane.offsetWidth,
-      styleWidth: pane.style.width,
-      computedWidth: parseInt(window.getComputedStyle(pane).width)
-    }))
-  });
-
   let totalFixedWidth = 0;
   let fixedPanes = [];
   let flexPanes = [];
@@ -232,16 +195,13 @@ const setupResizers = () => {
     if (paneProps && paneProps.width !== null && paneProps.width !== undefined) {
       // Use the original :width prop value
       explicitWidth = typeof paneProps.width === 'number' ? paneProps.width : parseInt(paneProps.width);
-      console.log(`Pane ${index} has explicit width from props: ${explicitWidth}px`);
     }
 
     if (explicitWidth && explicitWidth > 0) {
       totalFixedWidth += explicitWidth;
       fixedPanes.push({ pane, width: explicitWidth });
-      console.log(`Pane marked as fixed: ${explicitWidth}px`);
     } else {
       flexPanes.push(pane);
-      console.log(`Pane marked as flexible: computed ${parseInt(window.getComputedStyle(pane).width)}px`);
     }
   });
 
@@ -385,18 +345,14 @@ const tryInitializeResizers = () => {
     child => child.classList.contains('split-pane')
   );
 
-  console.log(`Retry ${initRetryCount.value}: Found ${paneElements.length} panes, container width: ${container.value.offsetWidth}`);
-
   // Check if we have multiple panes (single pane doesn't need resizers) and container has proper dimensions
   if (paneElements.length > 1 && container.value.offsetWidth > 10) {
-    console.log('Initializing resizers...');
     setupResizers();
     return true; // Successfully initialized
   } else if (paneElements.length === 1 && container.value.offsetWidth > 10) {
     // Single pane case - just set it to full width, but keep retrying in case more panes appear
     paneElements[0].style.width = '100%';
     paneElements[0].style.flex = 'none';
-    console.log('Single pane found, continuing to wait for more panes...');
   }
 
   // If we haven't found enough panes yet but haven't exceeded retries, try again
@@ -404,7 +360,6 @@ const tryInitializeResizers = () => {
     initRetryCount.value++;
     setTimeout(tryInitializeResizers, 100);
   } else {
-    console.log('Max retries reached, final setup with current panes');
     // Do final setup with whatever panes we have
     setupResizers();
   }
@@ -426,7 +381,6 @@ watch(
   },
   (newCount) => {
     if (newCount !== currentPaneCount.value) {
-      console.log(`Pane count changed from ${currentPaneCount.value} to ${newCount}, reinitializing...`);
       currentPaneCount.value = newCount;
 
       // Reset retry count and reinitialize
