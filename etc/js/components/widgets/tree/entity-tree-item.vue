@@ -11,18 +11,14 @@
       </div>
       <div class="entity-tree-item-name noselect">
         <span>
-          {{ itemName }}<template v-if="item.baseEntity"><span class="entity-tree-item-base">&nbsp;:&nbsp;{{ shortenEntity(item.baseEntity) }}</span></template>
+          {{ itemName }}<template v-if="item.baseEntity"><span class="entity-tree-item-base">&nbsp;:&nbsp;{{
+            shortenEntity(item.baseEntity) }}</span></template>
         </span>
       </div>
     </div>
     <template v-if="expand">
-      <entity-subtree
-        :conn="conn" 
-        :path="item.path"
-        :depth="depth + 1"
-        :selectedItem="selectedItem"
-        @select="selectChild"
-        :key="item.path">
+      <entity-subtree :conn="conn" :path="item.path" :depth="depth + 1" :selectedItem="selectedItem"
+        @select="selectChild" :key="item.path">
       </entity-subtree>
     </template>
   </div>
@@ -36,10 +32,10 @@ export default { name: "entity-tree-item" }
 import { defineProps, computed, ref, defineEmits, watch } from 'vue';
 
 const props = defineProps({
-  conn: {type: Object, required: true},
-  item: {type: Object, required: true},
-  selectedItem: {type: Object, required: false},
-  depth: {type: Number, required: false, default: 0}
+  conn: { type: Object, required: true },
+  item: { type: Object, required: true },
+  selectedItem: { type: Object, required: false },
+  depth: { type: Number, required: false, default: 0 }
 });
 
 const emit = defineEmits(["select"]);
@@ -107,18 +103,18 @@ function shortenEntity(entity) {
 </script>
 
 <style scoped>
-
 div.entity-tree-item {
   position: relative;
   display: grid;
   grid-template-columns: 18px 14px 1rem;
-  max-height: 28px;
-  padding-top: 4px;
+  height: 28px;
+  padding-top: 2px;
   cursor: pointer;
   border-radius: var(--border-radius-medium);
   border-color: rgba(0, 0, 0, 0);
   border-width: 1px;
   border-style: solid;
+  box-sizing: border-box;
 }
 
 div.entity-tree-item:hover {
@@ -163,5 +159,4 @@ div.entity-tree-item-name {
 span.entity-tree-item-base {
   color: var(--secondary-text);
 }
-
 </style>

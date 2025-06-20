@@ -2,9 +2,7 @@
   <div id="pane-tree" class="pane">
     <div class="pane-tree-search-box">
       <div class="pane-tree-select">
-        <dropdown 
-          :items="treeModeItems" 
-          v-model:active_item="appParams.tree_mode">
+        <dropdown :items="treeModeItems" v-model:active_item="appParams.tree_mode">
         </dropdown>
       </div>
       <div class="pane-tree-search">
@@ -12,11 +10,7 @@
       </div>
     </div>
     <div class="pane-tree-entity-tree">
-      <entity-tree 
-        :conn="conn" 
-        :nameFilter="nameFilter"
-        :queryFilter="queryFilter"
-        @select="selectItem"
+      <entity-tree :conn="conn" :nameFilter="nameFilter" :queryFilter="queryFilter" @select="selectItem"
         ref="entity_tree">
       </entity-tree>
     </div>
@@ -31,7 +25,7 @@ export default { name: "pane-tree" }
 import { computed, defineProps, defineModel, defineExpose, ref } from 'vue';
 
 const props = defineProps({
-  conn: {type: Object, required: true},
+  conn: { type: Object, required: true },
 });
 
 const emit = defineEmits(["scriptOpen", "entityOpen"]);
@@ -103,10 +97,11 @@ defineExpose({
 <style scoped>
 #pane-tree {
   display: grid;
-  grid-column: 1;
-  grid-template-rows: calc(72px + var(--gap)) 1rem;
+  grid-template-rows: auto 1fr;
   gap: 0.5rem;
   border-radius: var(--border-radius-medium);
+  height: 100% !important;
+  box-sizing: border-box;
 }
 
 div.pane-tree-search-box {
@@ -120,8 +115,9 @@ div.pane-tree-search-box {
 
 div.pane-tree-entity-tree {
   grid-row: 2;
-  height: calc(100vh - 72px - 8px - var(--header-height) - var(--footer-height) - 4 * var(--gap));
   overflow: auto;
+  min-height: 0;
+  /* Allows grid item to shrink below content size */
 }
 
 div.pane-tree-select {
@@ -135,5 +131,4 @@ div.pane-tree-select div.dropdown {
 div.pane-tree-search {
   grid-row: 2;
 }
-
 </style>

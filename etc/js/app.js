@@ -131,6 +131,8 @@ let components = [
   // Widgets
   loadModule('js/components/widgets/icon-button.vue', options),
   loadModule('js/components/widgets/expand-button.vue', options),
+  loadModule('js/components/widgets/split-pane.vue', options),
+  loadModule('js/components/widgets/split-pane-item.vue', options),
 
   // Entities page
   loadModule('js/components/pages/entities/page.vue', options),

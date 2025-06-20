@@ -1,32 +1,32 @@
 <template>
   <div id="page-entities" :class="pageCss">
-    <pane-tree 
-      :conn="conn"
-      v-model:app_params="appParams"
-      @scriptOpen="onScriptOpen"
-      @entityOpen="onEntityOpen"
-      v-if="app_params.sidebar"
-      ref="pane_tree">
-    </pane-tree>
-    <div id="canvasPlaceholder" :class="canvasCss" :style="`grid-column: ${canvasColumn}`">
-    </div>
-    <div :class="scriptCss" :style="`grid-column: ${scriptColumn}`">
-      <pane-scripts
-        :conn="conn"
-        v-model:script="appParams.script"
-        v-model:scripts="appParams.scripts"
-        ref="pane_scripts">
-      </pane-scripts>
-    </div>
-    <div class="page-entities-inspector" :style="`grid-column: ${inspectorColumn}`"
-      v-if="showInspector">
-      <pane-inspector
-        :conn="conn"
-        :app_params="appParams"
-        @abort="onAbort"
-        @scriptOpen="onScriptOpen">
-      </pane-inspector>
-    </div>
+    <split-pane-container>
+      <split-pane-item :width="300" :min-width="200" v-if="appParams.sidebar">
+        <pane-tree :conn="conn" v-model:app_params="appParams" @scriptOpen="onScriptOpen" @entityOpen="onEntityOpen"
+          ref="pane_tree">
+        </pane-tree>
+      </split-pane-item>
+
+      <split-pane-item v-if="showCanvas">
+        <div id="canvasPlaceholder" :class="canvasCss">
+        </div>
+      </split-pane-item>
+
+      <split-pane-item v-if="showScript">
+        <div :class="scriptCss">
+          <pane-scripts :conn="conn" v-model:script="appParams.script" v-model:scripts="appParams.scripts"
+            ref="pane_scripts">
+          </pane-scripts>
+        </div>
+      </split-pane-item>
+
+      <split-pane-item :width="500" :min-width="300" v-if="showInspector">
+        <div class="page-entities-inspector">
+          <pane-inspector :conn="conn" :app_params="appParams" @abort="onAbort" @scriptOpen="onScriptOpen">
+          </pane-inspector>
+        </div>
+      </split-pane-item>
+    </split-pane-container>
   </div>
 </template>
 
@@ -41,8 +41,8 @@ const pane_tree = ref(null);
 const pane_scripts = ref(null);
 
 const props = defineProps({
-  conn: {type: Object, required: true},
-  app_state: {type: Object, required: true},
+  conn: { type: Object, required: true },
+  app_state: { type: Object, required: true },
 });
 
 const appParams = defineModel("app_params");
@@ -123,60 +123,19 @@ const canvasCss = computed(() => {
   return classes;
 });
 
-const canvasColumn = computed(() => {
-  let result = 2;
-  if (!appParams.value.sidebar) {
-    result --;
-  }
-  return result;
-});
 
-const scriptColumn = computed(() => {
-  let result = 2;
-  if (showCanvas.value) {
-    result = 3;
-  }
-  if (!appParams.value.sidebar) {
-    result --;
-  }
-  return result;
-});
-
-const inspectorColumn = computed(() => {
-  let result = 3;
-  if (!appParams.value.sidebar) {
-    result --;
-  }
-  return result;
-});
 
 </script>
 
 <style scoped>
 #page-entities {
-  display: grid;
-  grid-template-columns: 300px calc(100% - 300px - var(--gap)) 0px;
-  grid-template-rows: 100%;
-  gap: var(--gap);
   height: calc(100vh - var(--header-height) - var(--footer-height) - 3 * var(--gap));
 }
 
-#page-entities:not(.page-entities-show-inspector):not(.page-entities-show-sidebar) {
-  grid-template-columns: calc(100%);
-}
-
-#page-entities.page-entities-show-sidebar.page-entities-show-inspector {
-  grid-template-columns: 300px calc(100% - 300px - 500px - 2 * var(--gap)) 500px !important;
-}
-
-#page-entities:not(.page-entities-show-sidebar).page-entities-show-inspector {
-  grid-template-columns: calc(100% - 760px - 1 * var(--gap)) 760px !important;
-}
-
 div.page-entities-canvas {
-  grid-row: 1;
   border-radius: var(--border-radius-medium);
   overflow: hidden;
+  height: 100%;
 }
 
 div.page-entities-canvas-hide {
@@ -184,13 +143,12 @@ div.page-entities-canvas-hide {
 }
 
 div.page-entities-script {
-  grid-row: 1;
   height: 100%;
 }
 
 div.page-entities-inspector {
-  grid-row: 1;
   overflow-x: auto;
+  height: 100%;
 }
 
 </style>
